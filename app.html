@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classification Test</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Product Defect Classification</h1>
+        <p>Upload an image to classify it.</p>
+
+        <!-- File input for image -->
+        <!-- <input type="file" id="imageInput" accept="image/*" multiple>
+        <br>
+        <button onclick="uploadFiles()">Classify Images</button>
+        <br> -->
+
+        <input type="file" id="imageInput" accept="image/*" multiple>
+<label for="imageInput">Choose Images</label>
+<br>
+<button onclick="uploadFiles()">Classify Images</button>
+
+
+        <!-- Display table for the results -->
+        <h2>Results:</h2>
+        <table border="1" id="resultsTable">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Predicted Class</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="resultRows">
+                <!-- Results will be dynamically added here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function uploadFiles() {
+    localStorage.clear();  // Clear localStorage before uploading new files
+
+    let formData = new FormData(); 
+    let fileInput = document.getElementById('imageInput');
+    let files = fileInput.files;
+
+    if (files.length === 0) {
+        alert("Please select one or more images to classify.");
+        return;
+    }
+
+    for (let i = 0; i < files.length; i++) {
+        formData.append('file', files[i]);
+    }
+
+    fetch('http://127.0.0.1:5000/upload', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data); // Check what is being returned
+        localStorage.setItem('classificationResults', JSON.stringify(data));  // Save results to localStorage
+        displayResults(data);  // Display the results in the table
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+window.onload = function() {
+    // let savedResults = localStorage.getItem('classificationResults');
+    // if (savedResults) {
+    //     displayResults(JSON.parse(savedResults));  // Display saved results
+    // }
+    localStorage.removeItem('classificationResults');
+};
+
+
+function displayResults(results) {
+    let resultRows = document.getElementById('resultRows');
+    resultRows.innerHTML = "";  // Clear previous results
+
+    results.forEach(result => {
+        let row = document.createElement('tr');
+
+        // Create and append table cells for each result
+        let imageCell = document.createElement('td');
+        let imgTag = document.createElement('img');
+        imgTag.src = result.image_url;
+        imgTag.width = 100;
+        imageCell.appendChild(imgTag);
+        row.appendChild(imageCell);
+
+        let predictedClassCell = document.createElement('td');
+        predictedClassCell.textContent = result.predicted_class;
+        row.appendChild(predictedClassCell);
+
+        let defectPercentCell = document.createElement('td');
+        defectPercentCell.textContent = result.status;
+        row.appendChild(defectPercentCell);
+
+        // Append the row to the results table body
+        resultRows.appendChild(row);
+    });
+}
+
+    </script>
+
+</body>
+</html>
