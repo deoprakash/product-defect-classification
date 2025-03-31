@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Load the saved model
-model = tf.keras.models.load_model('C:/Users/Deo Prakash/.vscode/Python Projects/python/python/tensorflow/image_classification/model.h5')
+model = tf.keras.models.load_model('//image_classification/model.h5')
 
 # Allow only certain file extensions (like images)
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
